@@ -127,6 +127,7 @@ static CDVWKInAppBrowser* instance = nil;
 - (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
 {
     CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
+    self.browserOptions = browserOptions;
     
     WKWebsiteDataStore* dataStore = [WKWebsiteDataStore defaultDataStore];
     if (browserOptions.cleardata) {
@@ -303,6 +304,12 @@ static CDVWKInAppBrowser* instance = nil;
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf->tmpWindow) {
                 CGRect frame = [[UIScreen mainScreen] bounds];
+                if (strongSelf.browserOptions.height != nil) {
+                    CGFloat height = strongSelf.browserOptions.height.floatValue;
+                    frame = CGRectMake(screenFrame.origin.x,
+                                       screenFrame.size.height - height,
+                                       screenFrame.size.width, height);
+                }
                 if(initHidden && osVersion < 11){
                    frame.origin.x = -10000;
                 }
@@ -1147,11 +1154,13 @@ BOOL isExiting = FALSE;
     
     // orientation portrait or portraitUpsideDown: status bar is on the top and web view is to be aligned to the bottom of the status bar
     // orientation landscapeLeft or landscapeRight: status bar height is 0 in but lets account for it in case things ever change in the future
-    viewBounds.origin.y = statusBarHeight;
-    
-    // account for web view height portion that may have been reduced by a previous call to this method
-    viewBounds.size.height = viewBounds.size.height - statusBarHeight + lastReducedStatusBarHeight;
-    lastReducedStatusBarHeight = statusBarHeight;
+    if (_browserOptions.height == nil) {
+        viewBounds.origin.y = statusBarHeight;
+        
+        // account for web view height portion that may have been reduced by a previous call to this method
+        viewBounds.size.height = viewBounds.size.height - statusBarHeight + lastReducedStatusBarHeight;
+        lastReducedStatusBarHeight = statusBarHeight;
+    }
     
     if ((_browserOptions.toolbar) && ([_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop])) {
         // if we have to display the toolbar on top of the web view, we need to account for its height
