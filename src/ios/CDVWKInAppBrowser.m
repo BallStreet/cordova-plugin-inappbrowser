@@ -306,9 +306,9 @@ static CDVWKInAppBrowser* instance = nil;
                 CGRect frame = [[UIScreen mainScreen] bounds];
                 if (strongSelf.browserOptions.height != nil) {
                     CGFloat height = strongSelf.browserOptions.height.floatValue;
-                    frame = CGRectMake(screenFrame.origin.x,
-                                       screenFrame.size.height - height,
-                                       screenFrame.size.width, height);
+                    frame = CGRectMake(frame.origin.x,
+                                       frame.size.height - height,
+                                       frame.size.width, height);
                 }
                 if(initHidden && osVersion < 11){
                    frame.origin.x = -10000;
